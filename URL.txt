@@ -1,0 +1,97 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package javaapplication2;
+
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.*;
+import javax.imageio.ImageIO;
+
+/**
+ *
+ * @author technipal
+ */
+
+class ImgLink extends Thread {
+     private URL url;
+
+    public ImgLink(URL url) {
+        this.url = url;
+    }
+    
+     public void run() {
+         try{  BufferedImage img = ImageIO.read(url);        
+            String fileName = url.getAuthority();
+
+            ImageIO.write(img, "jpg" , new File(fileName));
+            System.out.println("Image saved: " + fileName);
+
+        } 
+       catch (Exception e) {
+        e.printStackTrace();}
+    }
+}
+
+
+
+class HttpsLink extends Thread {
+   private URL url;
+
+    public HttpsLink(URL url) {
+        this.url = url;
+    }
+   
+    public void run() {
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(url.getAuthority() + ".html"));
+         
+            String line;
+            while ((line = reader.readLine()) != null) {
+                writer.write(line);
+                writer.newLine();
+            }
+            System.out.println("HTML saved: " + url.getAuthority() + ".html");
+
+        } catch (IOException e) {
+            e.printStackTrace();}
+        
+        
+    }}
+
+
+public class JavaApp {
+    
+   
+    public static void main(String[] args) throws Exception{
+            File file = new File("D:/1.txt");
+BufferedReader br = new BufferedReader(new FileReader(file));
+
+            String line;
+            while ((line = br.readLine()) != null)
+            {
+                URL url = new URL(line);
+                URLConnection urlc = url.openConnection();
+                
+                if (urlc.getContent().getClass().getCanonicalName().contains("image")) {
+                    ImgLink il= new ImgLink (url);
+                        il.start();
+                } 
+                else
+                {
+                    HttpsLink hl = new HttpsLink (url);
+                        hl.start();
+                }
+                
+            }
+}}
+        
+==============================================
+
+https://www.Facebook.com
+https://en.m.wikipedia.org/wiki/File:Cat03.jpg
+https://www.google.com
+https://en.m.wikipedia.org/wiki/File:Cat03.jpg
+
